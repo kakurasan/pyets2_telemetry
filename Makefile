@@ -22,7 +22,7 @@ SDK_DIR ?= scs_sdk_1_12
 SDK_CFLAGS := -I$(SDK_DIR)/include
 
 PYTHON_CFLAGS := $(shell pkg-config --cflags python3)
-PYTHON_LDFLAGS := $(shell pkg-config --libs python3)
+PYTHON_LDFLAGS := -lpython$(shell pkg-config --modversion python3)
 
 CXXFLAGS := $(SDK_CFLAGS) $(PYTHON_CFLAGS) -std=c++17 -fPIC -Wall -O2
 LDFLAGS := $(PYTHON_LDFLAGS)
@@ -31,9 +31,9 @@ VERSION := $(shell cut -d '"' -f 2 version.hpp | sed 's/\./_/g')
 INCS := pyhelp.hpp log.hpp version.hpp
 SRCS := loader.cpp pyhelp.cpp log.cpp
 LIBRARY_BASENAME := pyets2_telemetry_loader
-LIBRARY := $(LIBRARY_BASENAME).so
-VERSIONED_LIBRARY := $(LIBRARY_BASENAME)_$(VERSION).so
-DEV_LIBRARY := $(LIBRARY_BASENAME)_dev.so
+LIBRARY := $(LIBRARY_BASENAME).dll
+VERSIONED_LIBRARY := $(LIBRARY_BASENAME)_$(VERSION).dll
+DEV_LIBRARY := $(LIBRARY_BASENAME)_dev.dll
 PY_PLUGIN_DIR := python
 PY_PKG_DIR := $(PY_PLUGIN_DIR)/pyets2lib
 PY_FILES := $(wildcard $(PY_PKG_DIR)/*.py)
@@ -44,10 +44,10 @@ TEST_SRCS := $(SRCS) test.cpp
 .DEFAULT_GOAL: $(LIBRARY)
 
 $(LIBRARY): $(SRCS) $(INCS)
-	g++ $(CXXFLAGS) -o $@ --shared -Wl,--no-allow-shlib-undefined -Wl,-soname,$@  $(SRCS) $(LDFLAGS)
+	wineg++ $(CXXFLAGS) -o $@ -shared -Wl,--no-allow-shlib-undefined -Wl,-soname,$@  $(SRCS) $(LDFLAGS)
 
 test: $(TEST_SRCS)
-	g++ $(CXXFLAGS) -g -o $@ $(TEST_SRCS) $(LDFLAGS)
+	wineg++ $(CXXFLAGS) -g -o $@ $(TEST_SRCS) $(LDFLAGS)
 
 .PHONY: install
 install: uninstall $(LIBRARY) $(PY_FILES)
