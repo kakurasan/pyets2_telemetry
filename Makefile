@@ -17,7 +17,7 @@
 # along with pyets2_telemetry.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-SDK_DIR ?= eurotrucks2_telemetry_sdk_1.10
+SDK_DIR ?= scs_sdk_1_12
 
 SDK_CFLAGS := -I$(SDK_DIR)/include
 
